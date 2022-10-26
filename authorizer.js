@@ -1,6 +1,6 @@
 const { CognitoJwtVerifier } = require("aws-jwt-verify");
-const COGNITO_USERPOOL_ID = env.COGNITO_USERPOOL_ID;
-const COGNITO_WEB_CLIENT_ID = env.COGNITO_WEB_CLIENT_ID;
+const COGNITO_USERPOOL_ID = process.env.COGNITO_USERPOOL_ID;
+const COGNITO_WEB_CLIENT_ID = process.env.COGNITO_WEB_CLIENT_ID;
 const jwtVerifier = CognitoJwtVerifier.create({
   userPoolId: COGNITO_USERPOOL_ID,
   tokenUse: "id",
@@ -8,7 +8,11 @@ const jwtVerifier = CognitoJwtVerifier.create({
 })
 
 const generatePolicy = (principalId, effect, resource) => {
-  // Do some token/auth validation....but we'll mock this
+  var tmp = resource.split(':');
+  var apiGatewayArnTmp = tmp[5].split('/');
+  // Create wildcard resource
+  var resource = tmp[0] + ":" + tmp[1] + ":" + tmp[2] + ":" + tmp[3] + ":" + tmp[4] + ":" + apiGatewayArnTmp[0] + '/*/*'; 
+  
   const authResponse = {};
   authResponse.principalId = principalId;
   if (effect && resource) {
